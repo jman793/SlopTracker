@@ -1,0 +1,27 @@
+{
+  "name": "sloptracker",
+  "version": "1.0.0",
+  "description": "Discord bot that tracks slop with your friends",
+  "keywords": [
+    "discord",
+    "bot"
+  ],
+  "license": "ISC",
+  "author": "Jonah Marz",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "node index.js",
+    "start:dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11",
+    "prettier": "^3.7.4"
+  }
+}
