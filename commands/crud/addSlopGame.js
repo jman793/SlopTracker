@@ -17,6 +17,14 @@ export default {
         .setRequired(true),
     ),
   async execute(interaction, dao) {
+    const urlFormat =
+      /^(https?:\/\/)?store\.steampowered\.com\/(app|sub)\/(\d+|\w+)\/?/i;
+
+    if (!urlFormat.test(interaction.options.getString('link'))) {
+      interaction.reply('Invalid link.');
+      return;
+    }
+
     const game = {
       name: interaction.options.getString('name'),
       link: interaction.options.getString('link'),
