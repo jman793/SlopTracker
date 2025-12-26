@@ -1,6 +1,8 @@
 import { readFile, writeFile } from 'fs/promises';
 import { MAX_OWNERS, MAX_ENDORSEMENTS } from './constants.js';
 
+import { calculateOwnership } from './suggestion.js';
+
 const MAX_GAMES = 1000;
 
 export class SlopGameModelDao {
@@ -53,21 +55,24 @@ export class SlopGameModelDao {
     return game;
   }
 
-  // If owners is undefined, then it will return all games
-  // Returns games sorted by number of owners
+  // Returns games sorted by percentage of ownership
+  // If no owners it just passes in the most owned games
   async findGamesByOwnerList(owners) {
     const games = await this.readStateFile();
-    const result = [];
-    for (const game of games) {
-      if (
-        !owners ||
-        owners.length == 0 ||
-        owners.every((owner) => game.owners.includes(owner))
-      ) {
-        result.push(game);
-      }
+    const sanitzedOwners = owners || [];
+    if (!owners || owners.length === 0) {
+      console.log('No owners passed in');
+      return games.sort((a, b) => {
+        return b.owners.length - a.owners.length;
+      });
     }
-    return result.sort((game) => game.owners.length).reverse();
+    return games
+      .sort(
+        (a, b) =>
+          calculateOwnership(a, sanitzedOwners) -
+          calculateOwnership(b, sanitzedOwners),
+      )
+      .reverse();
   }
 
   async addEndorsement(gameName, user) {

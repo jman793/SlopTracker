@@ -1,6 +1,11 @@
 import { SlashCommandBuilder, PollLayoutType, MessageFlags } from 'discord.js';
 import { MAX_OWNERS } from '../../constants.js';
 
+import {
+  calculateOwnership,
+  getOwnershipAsPercentage,
+} from '../../suggestion.js';
+
 export default {
   data: new SlashCommandBuilder()
     .setName('poll')
@@ -31,7 +36,7 @@ export default {
     const MAX_POLL_OPTIONS = 10;
     const answers = ownedGames.slice(0, MAX_POLL_OPTIONS).map((game) => {
       return {
-        text: `${game.name}: Owners: ${game.owners.length}`,
+        text: `${game.name}: Owners: ${game.owners.length}: Percentage: ${getOwnershipAsPercentage(calculateOwnership(game, owners))}%`,
       };
     });
     if (answers.length === 0) {
