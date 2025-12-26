@@ -29,6 +29,7 @@ export default {
       name: interaction.options.getString('name'),
       link: interaction.options.getString('link'),
       endorsements: [interaction.user.username],
+      owners: [],
     };
     await dao.appendStateFile(game);
     interaction.reply(`Added ${game.name} to the list.`);

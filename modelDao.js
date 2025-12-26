@@ -1,8 +1,7 @@
 import { readFile, writeFile } from 'fs/promises';
+import { MAX_OWNERS, MAX_ENDORSEMENTS } from './constants.js';
 
 const MAX_GAMES = 1000;
-const MAX_OWNERS = 30;
-const MAX_ENDORSEMENTS = 30;
 
 export class SlopGameModelDao {
   filePath;
@@ -52,6 +51,23 @@ export class SlopGameModelDao {
       (game) => game.name.toLowerCase() === name.toLowerCase(),
     );
     return game;
+  }
+
+  // If owners is undefined, then it will return all games
+  // Returns games sorted by number of owners
+  async findGamesByOwnerList(owners) {
+    const games = await this.readStateFile();
+    const result = [];
+    for (const game of games) {
+      if (
+        !owners ||
+        owners.length == 0 ||
+        owners.every((owner) => game.owners.includes(owner))
+      ) {
+        result.push(game);
+      }
+    }
+    return result.sort((game) => game.owners.length).reverse();
   }
 
   async addEndorsement(gameName, user) {
