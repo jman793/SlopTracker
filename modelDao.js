@@ -46,20 +46,6 @@ export class SlopGameModelDao {
     await writeFile(this.filePath, JSON.stringify(jsonObject), 'utf8'); // Write the string to the file
   }
 
-  // FIXME: This is not working
-  // And Maybe thats fine? I can just manually clean it up easily
-  async removeGame(name) {
-    const data = await this.readStateFile();
-    const index = data.findIndex(
-      (game) => game.name.toLowerCase() === name.toLowerCase(),
-    );
-    if (index === -1) {
-      throw new Error(`Game ${name} not found`);
-    }
-    data.splice(index, 1);
-    await this.appendStateFile(data);
-  }
-
   async findGameByName(name) {
     const data = await this.readStateFile();
     const game = data.find(
