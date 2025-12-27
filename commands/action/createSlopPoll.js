@@ -52,6 +52,7 @@ export default {
         answers: answers,
         duration: 1,
         layoutType: PollLayoutType.Default,
+        allowMultiselect: true,
       },
     });
     let ownersString = `Games: Owners: Endorsements:\n`;
