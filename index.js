@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, Collection, Events } from 'discord.js';
 
 import fs from 'fs';
 import path from 'path';
+import winston from 'winston';
 import { fileURLToPath } from 'url';
 import { SlopGameModelDao } from './modelDao.js';
 
@@ -11,10 +12,24 @@ config();
 const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.DISCORD_APP_ID;
 const GAMES_FILE_PATH = process.env.GAMES_FILE_PATH;
-// To get all steam games and app ids
-('curl https://partner.steam-api.com/IStoreService/GetAppList/v1/');
+const STAGE = process.env.STAGE;
 
-const dao = new SlopGameModelDao(GAMES_FILE_PATH);
+const LOGGER = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
+  transports: [new winston.transports.File({ filename: 'app.log' })],
+});
+
+if (STAGE !== 'prod') {
+  LOGGER.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  );
+}
+
+const dao = new SlopGameModelDao(GAMES_FILE_PATH, LOGGER);
 
 const discordClient = new Client({
   intents: [
@@ -26,7 +41,7 @@ const discordClient = new Client({
 });
 
 discordClient.on('ready', () => {
-  console.log(`Logged in as ${discordClient.user.tag}!`);
+  LOGGER.info(`Logged in as ${discordClient.user.tag}!`);
 });
 
 discordClient.commands = new Collection();
@@ -48,7 +63,7 @@ for (const folder of commandFolders) {
     if ('data' in command.default && 'execute' in command.default) {
       discordClient.commands.set(command.default.data.name, command);
     } else {
-      console.log(
+      LOGGER.warn(
         `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
       );
     }
@@ -75,7 +90,7 @@ discordClient.on('messageCreate', (message) => {
         .appendStateFile(game)
         .then(message.channel.send('wrote successfully'));
     } catch (error) {
-      console.error('Error reading JSON file:', error);
+      LOGGER.error('Error reading JSON file:', error);
     }
   }
 });
@@ -85,14 +100,14 @@ discordClient.on(Events.InteractionCreate, async (interaction) => {
   const command = interaction.client.commands.get(interaction.commandName);
 
   if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
+    LOGGER.error(`No command matching ${interaction.commandName} was found.`);
     return;
   }
 
   try {
     await command.default.execute(interaction, dao);
   } catch (error) {
-    console.error(error);
+    LOGGER.error(error);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: 'There was an error while executing this command!',

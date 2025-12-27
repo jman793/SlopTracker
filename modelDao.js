@@ -7,9 +7,11 @@ const MAX_GAMES = 1000;
 
 export class SlopGameModelDao {
   filePath;
+  logger;
 
-  constructor(filePath) {
+  constructor(filePath, logger) {
     this.filePath = filePath;
+    this.logger = logger;
   }
 
   async readStateFile() {
@@ -42,8 +44,6 @@ export class SlopGameModelDao {
       jsonObject.games.push(game);
     }
 
-    console.log(jsonObject.games);
-
     await writeFile(this.filePath, JSON.stringify(jsonObject), 'utf8'); // Write the string to the file
   }
 
@@ -61,7 +61,7 @@ export class SlopGameModelDao {
     const games = await this.readStateFile();
     const sanitzedOwners = owners || [];
     if (!owners || owners.length === 0) {
-      console.log('No owners passed in');
+      this.logger.info('No owners passed in');
       return games.sort((a, b) => {
         return b.owners.length - a.owners.length;
       });
@@ -87,11 +87,11 @@ export class SlopGameModelDao {
     } else if (gameEndorsements.length >= MAX_ENDORSEMENTS) {
       throw new Error('Max endorsements reached');
     } else if (gameEndorsements.includes(user)) {
-      console.log(`User ${user} already endorsed ${gameName}`);
+      this.logger.warn(`User ${user} already endorsed ${gameName}`);
       return;
     } else {
       game.endorsements.push(user);
-      console.log(`User ${user} endorsed ${gameName}`);
+      this.logger.warn(`User ${user} endorsed ${gameName}`);
     }
     await this.appendStateFile(game);
   }
@@ -128,11 +128,11 @@ export class SlopGameModelDao {
     } else if (gameOwners.length >= MAX_OWNERS) {
       throw new Error('Max owners reached');
     } else if (gameOwners.includes(user)) {
-      console.log(`User ${user} already owns ${gameName}`);
+      this.logger.warn(`User ${user} already owns ${gameName}`);
       return;
     } else {
       game.owners.push(user);
-      console.log(`User ${user} owns ${gameName}`);
+      this.logger.info(`User ${user} owns ${gameName}`);
     }
     await this.appendStateFile(game);
   }
