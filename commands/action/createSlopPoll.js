@@ -46,31 +46,23 @@ export default {
       });
       return;
     }
-    try {
-      interaction.channel.send({
-        poll: {
-          question: { text: 'Vote on slop games' },
-          answers: answers,
-          duration: 1,
-          layoutType: PollLayoutType.Default,
-        },
-      });
-      let ownersString = `Games: Owners: Endorsements:\n`;
-      for (const game of ownedGames) {
-        ownersString += `${game.name}: ${game.owners.join(', ') || 'No owners'}: ${game.endorsements.join(', ') || 'No Endorsements'}\n`;
-      }
-      await interaction.channel.send(ownersString);
-      await interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: 'Poll created.',
-      });
-    } catch (error) {
-      console.error(error);
-      interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: `Error creating poll.`,
-      });
+    interaction.channel.send({
+      poll: {
+        question: { text: 'Vote on slop games' },
+        answers: answers,
+        duration: 1,
+        layoutType: PollLayoutType.Default,
+      },
+    });
+    let ownersString = `Games: Owners: Endorsements:\n`;
+    for (const game of ownedGames) {
+      ownersString += `${game.name}: ${game.owners.join(', ') || 'No owners'}: ${game.endorsements.join(', ') || 'No Endorsements'}\n`;
     }
+    await interaction.channel.send(ownersString);
+    await interaction.reply({
+      flags: MessageFlags.Ephemeral,
+      content: 'Poll created.',
+    });
     return;
   },
 };

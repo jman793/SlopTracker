@@ -21,13 +21,8 @@ export default {
   async execute(interaction, dao) {
     const name = interaction.options.getString('name');
     const who = interaction.options.getUser('who') || interaction.user;
-    try {
-      await dao.removeEndorsement(name, who.username);
-      interaction.reply(`User ${who} removed endorsement from ${name}.`);
-    } catch (error) {
-      console.error(error);
-      interaction.reply(`Error removing endorsement from game.`);
-    }
+    await dao.removeEndorsement(name, who.username);
+    interaction.reply(`User ${who} removed endorsement from ${name}.`);
     return;
   },
 };

@@ -21,13 +21,8 @@ export default {
   async execute(interaction, dao) {
     const name = interaction.options.getString('name');
     const who = interaction.options.getUser('who') || interaction.user;
-    try {
-      await dao.addEndorsement(name, who.username);
-      interaction.reply(`User ${who} endorsed ${name}.`);
-    } catch (error) {
-      console.error(error);
-      interaction.reply(`Error endorsing game.`);
-    }
+    await dao.addEndorsement(name, who.username);
+    interaction.reply(`User ${who} endorsed ${name}.`);
     return;
   },
 };

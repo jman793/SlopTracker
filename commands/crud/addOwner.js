@@ -21,13 +21,8 @@ export default {
   async execute(interaction, dao) {
     const name = interaction.options.getString('name');
     const who = interaction.options.getUser('who') || interaction.user;
-    try {
-      await dao.addOwner(name, who.username);
-      interaction.reply(`User ${who} marked as owner for ${name}.`);
-    } catch (error) {
-      console.error(error);
-      interaction.reply(`Error adding owner to game.`);
-    }
+    await dao.addOwner(name, who.username);
+    interaction.reply(`User ${who} marked as owner for ${name}.`);
     return;
   },
 };
