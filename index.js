@@ -1,4 +1,10 @@
-import { Client, GatewayIntentBits, Collection, Events } from 'discord.js';
+import {
+  Client,
+  GatewayIntentBits,
+  Collection,
+  Events,
+  MessageFlags,
+} from 'discord.js';
 
 import fs from 'fs';
 import path from 'path';
