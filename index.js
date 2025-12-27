@@ -113,7 +113,7 @@ discordClient.on(Events.InteractionCreate, async (interaction) => {
   try {
     await command.default.execute(interaction, dao);
   } catch (error) {
-    LOGGER.error(error);
+    LOGGER.error(`Error executing command: ${error}`);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: 'There was an error while executing this command!',
